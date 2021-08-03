@@ -11,20 +11,26 @@
       </div>
     </div>
     <div id="burger-table-rows">
-      <div class="burger-table-row">
-        <div class="order-number">1</div>
-        <div>Allan</div>
-        <div>Integral</div>
-        <div>Picanha</div>
+      <div class="burger-table-row" v-for="burger in burgers" :key="burger.id">
+        <div class="order-number">{{ burger.id }}</div>
+        <div>{{ burger.nome }}</div>
+        <div>{{ burger.pao }}</div>
+        <div>{{ burger.carne }}</div>
         <div>
           <ul>
-            <li>Salame</li>
-            <li>Tomate</li>
+            <li v-for="(optional, index) in burger.opcionais" :key="index">{{ optional }}</li>
           </ul>
         </div>
         <div>
           <select name="status" class="status">
             <option value="">Selecione</option>
+            <option
+              v-for="s in status"
+              :key="s.id"
+              :value="s.tipo"
+              :selected="burger.status === s.tipo"
+              >{{ s.tipo }}</option
+            >
           </select>
           <button class="delete-btn">Cancelar</button>
         </div>
@@ -35,6 +41,31 @@
 <script>
 export default {
   name: 'Dashboard',
+  data() {
+    return {
+      burgers: null,
+      burger_id: null,
+      status: [],
+    };
+  },
+  methods: {
+    async getOrders() {
+      const req = await fetch('http://localhost:3000/burgers');
+      const res = await req.json();
+
+      this.burgers = res;
+    },
+    async getStatus() {
+      const req = await fetch('http://localhost:3000/status');
+      const res = await req.json();
+
+      this.status = res;
+    },
+  },
+  mounted() {
+    this.getOrders();
+    this.getStatus();
+  },
 };
 </script>
 <style lang="scss" scoped>
